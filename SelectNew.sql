@@ -14,7 +14,7 @@ group by name_alb
 select name_perf from performers p 
 join performersalbums p2 on p.perf_id = p2.perf_id
 join albums a on p2.alb_if = a.alb_if
-where a.year_of_release != 2020
+where name_perf not in (select name_perf from performers p2 where a.year_of_release = 2020)
 
 select name_coll from collection c 
 join trackscollection t on c.coll_id = t.coll_id 
@@ -33,7 +33,6 @@ group by a.name_alb
 having count(*) > 1
 
 
-
 insert into tracks (name_tracks, duration, alb_if)
 values('tracks95', 310, 1)
 
@@ -48,11 +47,12 @@ join albums a on p2.alb_if = a.alb_if
 join tracks t on a.alb_if = t.alb_if 
 where duration = (select min(duration) from tracks) 
 
-select name_alb, count(name_tracks) from albums a 
+select name_alb, count(tracks_id)from albums a
 join tracks t on a.alb_if = t.alb_if
-group by a.name_alb
-having count(tracks_id) = 1
- 
+group by a.name_alb 
+having count(tracks_id) = (select count(tracks_id)from albums a 
+join tracks t on a.alb_if = t.alb_if 
+group by a.name_alb order by count limit 1) 
 
 
 
@@ -60,13 +60,3 @@ having count(tracks_id) = 1
 
 
 
-
-
-
-
-
-
-
-
-
- 
